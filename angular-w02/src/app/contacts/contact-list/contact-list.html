@@ -1,17 +1,17 @@
 <div class="panel panel-default">
-  <div class="panel-heading clearfix">
-    <h3 class="panel-title pull-left">Contacts</h3>
-    <a class="btn btn-success pull-right">New Contact</a>
+  <div class="panel-heading">
+    <h3 class="panel-title">Contacts</h3>
   </div>
   <div class="panel-body">
-    <a *ngFor="let contact of contacts" class="list-group-item clearfix">
-      <div class="pull-left">
-        <h4 class="list-group-item-heading">{{contact.name}}</h4>
+    <div class="row">
+      <div class="col-xs-12">
+        <cms-contact-item 
+          *ngFor="let contact of contacts"
+          [contact]="contact"
+          (click)="onSelected(contact)">
+        </cms-contact-item>
       </div>
-      <span class="pull-right">
-        <img [src]="contact.imageUrl" [alt]="contact.name" 
-             class="img-circle" style="width: 50px; height: 50px;">
-      </span>
-    </a>
+    </div>
   </div>
 </div>
+

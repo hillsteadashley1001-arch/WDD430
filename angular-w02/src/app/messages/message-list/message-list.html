@@ -1,0 +1,21 @@
+<section class="message-list">
+  <!-- Message Edit Form (top) -->
+  <cms-message-edit (addMessageEvent)="onAddMessage($event)"></cms-message-edit>
+  
+  <!-- Messages List -->
+  <div class="messages-container">
+    <h3>Messages ({{ messages.length }})</h3>
+    
+    <div class="messages" *ngIf="messages.length > 0">
+      <cms-message-item 
+        *ngFor="let message of messages; trackBy: trackById" 
+        [message]="message">
+      </cms-message-item>
+    </div>
+    
+    <p *ngIf="messages.length === 0" class="no-messages">
+      No messages yet. Create one above!
+    </p>
+  </div>
+</section>
+

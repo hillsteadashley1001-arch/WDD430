@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ContactItemComponent } from '../contact-item/contact-item';  // ADD THIS
 import { Contact } from '../contact.model';
 
 @Component({
   selector: 'cms-contact-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ContactItemComponent],
   templateUrl: './contact-list.html',
   styleUrls: ['./contact-list.css']  // Note: styleUrl -> styleUrls (plural)
 })
@@ -28,4 +29,9 @@ export class ContactListComponent {
       null
     )
   ];
+  @Output() selectedContactEvent = new EventEmitter<Contact>();
+  
+  onSelected(contact: Contact): void {
+    this.selectedContactEvent.emit(contact);
+  }
 }

@@ -1,0 +1,9 @@
+<div *ngIf="document" class="panel panel-default">
+  <div class="panel-heading">
+    <h4>{{document.name}}</h4>
+  </div>
+  <div class="panel-body">
+    <p>{{document.description}}</p>
+    <a [href]="document.url" target="_blank" class="btn btn-primary">View Document</a>
+  </div>
+</div>

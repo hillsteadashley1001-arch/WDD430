@@ -1,0 +1,21 @@
+.message-list {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.messages-container {
+  margin-top: 2rem;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.no-messages {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}

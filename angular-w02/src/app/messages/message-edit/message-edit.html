@@ -1,0 +1,39 @@
+<section class="message-edit">
+  <h2>New Message</h2>
+  
+  <!-- Remove <form> wrapper entirely -->
+  <div class="form-container">
+    <div class="form-group">
+      <label for="subject">Subject</label>
+      <input 
+        id="subject"
+        #subject
+        type="text" 
+        placeholder="Enter subject">
+    </div>
+    
+    <div class="form-group">
+      <label for="msgText">Message</label>
+      <input 
+        id="msgText"
+        #msgText
+        type="text" 
+        placeholder="Enter message text">
+    </div>
+    
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-primary"
+        (click)="onSendMessage()">
+        Send Message
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="onClear()">
+        Clear
+      </button>
+    </div>
+  </div>
+</section>
