@@ -19,7 +19,7 @@ export class DocumentListComponent {
 
   @Output() selectedDocumentEvent = new EventEmitter<Document>();
   
-  onSelected(document: Document): void {
+  onSelectedDocument(document: Document): void {
     this.selectedDocumentEvent.emit(document);
   }
 }
