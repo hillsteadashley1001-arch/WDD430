@@ -1,4 +1,4 @@
-export class Contact {
+export class Contact { 
   constructor(
     public id: string,
     public name: string,
@@ -6,5 +6,5 @@ export class Contact {
     public phone: string,
     public imageUrl: string,
     public group: Contact[] | null
-  ) {}
+  ) { }
 }
