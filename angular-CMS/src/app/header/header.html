@@ -5,13 +5,13 @@
     </div>
 
     <ul class="nav navbar-nav">
-      <li><a href="#" (click)="onSelected('documents')">Documents</a></li>
-      <li><a href="#" (click)="onSelected('messages')">Messages</a></li>
-      <li><a href="#" (click)="onSelected('contacts')">Contacts</a></li>
+      <li routerLinkActive="active"><a [routerLink]="['/documents']">Documents</a></li>
+      <li routerLinkActive="active"><a [routerLink]="['/messages']">Messages</a></li>
+      <li routerLinkActive="active"><a [routerLink]="['/contacts']">Contacts</a></li>
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
-      <li class="dropdown" appDropdown>  <!-- ← ADD appDropdown HERE -->
+      <li class="dropdown" appDropdown>  
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
           User <span class="caret"></span>
         </a>

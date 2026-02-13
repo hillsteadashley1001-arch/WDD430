@@ -1,3 +1,5 @@
-<a class="list-group-item clearfix documentDiv" (click)="onSelectedDocument(document)">
-  {{ document.name }}
+<a [routerLink]="[document.id]" 
+   routerLinkActive="active" 
+   class="list-group-item document-item-card">
+  <p class="list-group-item-text">{{ document.name }}</p>
 </a>

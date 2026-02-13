@@ -7,3 +7,43 @@
   float: left;
   padding: .25rem
 }
+
+.doc-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  height: 120px; /* Fixed height for a square look */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fff;
+  
+  text-decoration: none;
+  color: #337ab7;
+  font-weight: 500;
+  
+  /* Critical for fixing the overlap */
+  overflow: hidden;
+  word-wrap: break-word;
+  transition: all 0.2s ease;
+}
+
+.doc-card:hover {
+  background-color: #f9f9f9;
+  border-color: #bbb;
+  text-decoration: none;
+}
+
+/* The active state from your first image */
+.doc-card.active {
+  background-color: #337ab7 !important;
+  color: white !important;
+  border-color: #2e6da4 !important;
+}
+
+.doc-title {
+  font-size: 13px;
+  line-height: 1.3;
+}

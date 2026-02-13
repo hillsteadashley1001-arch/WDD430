@@ -1,26 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ContactItemComponent } from '../contact-item/contact-item';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Contact } from '../contact.model';
-import { ContactService } from '../contact.service';  
+import { ContactService } from '../contact.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { ContactItemComponent } from '../contact-item/contact-item';
 
 @Component({
   selector: 'cms-contact-list',
   standalone: true,
-  imports: [CommonModule, ContactItemComponent],
+  imports: [CommonModule, RouterModule, ContactItemComponent],
   templateUrl: './contact-list.html',
-  styleUrls: ['./contact-list.css']
+  styleUrl: './contact-list.css'
 })
-export class ContactListComponent implements OnInit {
-  contacts: Contact[] = []; 
+export class ContactListComponent implements OnInit, OnDestroy {
+  contacts: Contact[] = [];
+  private subscription!: Subscription;
 
-  constructor(private contactService: ContactService) {} 
+  constructor(private contactService: ContactService) {}
 
-  ngOnInit() {
-    this.contacts = this.contactService.getContacts();  
+  ngOnInit(): void {
+
+    this.contacts = this.contactService.getContacts();
+
+    this.subscription = this.contactService.contactChangedEvent.subscribe(
+      (contactList: Contact[]) => {
+        this.contacts = contactList;
+      }
+    );
   }
 
-  onSelected(contact: Contact): void {
-    this.contactService.contactSelectedEvent.emit(contact);
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

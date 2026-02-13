@@ -6,8 +6,8 @@
            class="img-circle" style="width: 80px; height: 80px;">
     </span>
     <div class="btn-group pull-right" style="margin-right: 10px;">
-      <a class="btn btn-primary">Edit</a>
-      <a class="btn btn-danger">Delete</a>
+      <a [routerLink]="['edit']" class="btn btn-primary">Edit</a>
+      <a (click)="onDelete()" class="btn btn-danger">Delete</a>
     </div>
   </div>
   <div class="panel-body">

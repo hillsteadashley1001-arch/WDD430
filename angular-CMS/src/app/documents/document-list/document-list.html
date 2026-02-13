@@ -1,17 +1,16 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <div class="row pad-left-right">
-      <span class="pull-left title">Documents</span>
-      <a class="btn btn-success pull-right">Add Document</a>
+    <div class="row" style="padding: 10px; display: flex; align-items: center;">
+      <span class="title" style="font-size: 24px; font-weight: bold; margin-left: 10px;">Documents</span>
+      <div style="flex-grow: 1;"></div>
+      <a [routerLink]="['new']" class="btn btn-success" style="margin-right: 10px;">Add Document</a>
     </div>
   </div>
   <div class="panel-body">
-    <div class="center-panel">
-      <cms-document-item 
-        *ngFor="let document of documents"      
-        [document]="document"                   
-        (selectedDocumentEvent)="onSelectedDocument($event)"> 
-      </cms-document-item>
+    <div class="row" style="display: flex; flex-wrap: wrap;">
+      <div class="col-xs-3" *ngFor="let document of documents" style="margin-bottom: 20px;">
+        <cms-document-item [document]="document"></cms-document-item>
+      </div>
     </div>
   </div>
 </div>
