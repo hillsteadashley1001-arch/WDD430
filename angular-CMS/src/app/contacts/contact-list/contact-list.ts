@@ -15,15 +15,13 @@ import { ContactItemComponent } from '../contact-item/contact-item';
 })
 export class ContactListComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
-  private subscription!: Subscription;
+  subscription!: Subscription;
 
   constructor(private contactService: ContactService) {}
 
   ngOnInit(): void {
-
     this.contacts = this.contactService.getContacts();
-
-    this.subscription = this.contactService.contactChangedEvent.subscribe(
+    this.subscription = this.contactService.contactListChangedEvent.subscribe(
       (contactList: Contact[]) => {
         this.contacts = contactList;
       }
@@ -31,8 +29,6 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.subscription.unsubscribe();
   }
 }

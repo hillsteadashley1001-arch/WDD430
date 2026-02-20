@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs'; // 1. Import Subject
+import { Subject } from 'rxjs';
 import { Document } from './document.model';
 import { MOCKDOCUMENTS } from './MOCKDOCUMENTS';
 
@@ -7,13 +7,24 @@ import { MOCKDOCUMENTS } from './MOCKDOCUMENTS';
   providedIn: 'root'
 })
 export class DocumentService {
-  // 2. Use Subject for data changes (standard practice for Services)
-  documentChangedEvent = new Subject<Document[]>();
-
+  documentListChangedEvent = new Subject<Document[]>();
+  maxDocumentId: number;
   private documents: Document[] = [];
 
   constructor() {
     this.documents = MOCKDOCUMENTS;
+    this.maxDocumentId = this.getMaxId();
+  }
+
+  getMaxId(): number {
+    let maxId = 0;
+    for (let document of this.documents) {
+      let currentId = parseInt(document.id);
+      if (currentId > maxId) {
+        maxId = currentId;
+      }
+    }
+    return maxId;
   }
 
   getDocuments(): Document[] {
@@ -21,42 +32,36 @@ export class DocumentService {
   }
 
   getDocument(id: string): Document | null {
-    // Ensuring ID comparison is robust
     return this.documents.find((doc) => String(doc.id) === id) || null;
   }
 
   addDocument(newDocument: Document) {
     if (!newDocument) return;
-    
-    // Assign a new ID (assuming strings based on your earlier setup)
-    newDocument.id = String(Math.floor(Math.random() * 10000)); 
-    
+
+    this.maxDocumentId++;
+    newDocument.id = String(this.maxDocumentId);
     this.documents.push(newDocument);
-    // Push the updated list to all subscribers
-    this.documentChangedEvent.next(this.documents.slice());
+    this.documentListChangedEvent.next(this.documents.slice());
   }
 
   updateDocument(originalDocument: Document, newDocument: Document) {
     if (!originalDocument || !newDocument) return;
 
-    const pos = this.documents.findIndex(d => d.id === originalDocument.id);
+    const pos = this.documents.indexOf(originalDocument);
     if (pos < 0) return;
-    
-    // Keep the original ID
+
     newDocument.id = originalDocument.id;
     this.documents[pos] = newDocument;
-    
-    // Push the updated list to all subscribers
-    this.documentChangedEvent.next(this.documents.slice());
+    this.documentListChangedEvent.next(this.documents.slice());
   }
 
   deleteDocument(document: Document) {
     if (!document) return;
 
-    const pos = this.documents.findIndex(d => d.id === document.id);
+    const pos = this.documents.indexOf(document);
     if (pos < 0) return;
 
     this.documents.splice(pos, 1);
-    this.documentChangedEvent.next(this.documents.slice());
+    this.documentListChangedEvent.next(this.documents.slice());
   }
 }

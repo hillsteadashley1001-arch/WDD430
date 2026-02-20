@@ -7,13 +7,24 @@ import { MOCKCONTACTS } from './MOCKCONTACTS';
   providedIn: 'root'
 })
 export class ContactService {
-
-  contactChangedEvent = new Subject<Contact[]>();
-
+  contactListChangedEvent = new Subject<Contact[]>();
+  maxContactId: number;
   private contacts: Contact[] = [];
 
   constructor() {
     this.contacts = MOCKCONTACTS;
+    this.maxContactId = this.getMaxId();
+  }
+
+  getMaxId(): number {
+    let maxId = 0;
+    for (let contact of this.contacts) {
+      let currentId = parseInt(contact.id);
+      if (currentId > maxId) {
+        maxId = currentId;
+      }
+    }
+    return maxId;
   }
 
   getContacts(): Contact[] {
@@ -27,33 +38,30 @@ export class ContactService {
   addContact(newContact: Contact) {
     if (!newContact) return;
 
-    // Generate a simple ID
-    newContact.id = String(Math.floor(Math.random() * 10000));
+    this.maxContactId++;
+    newContact.id = String(this.maxContactId);
     this.contacts.push(newContact);
-    
-    // Broadcast the updated list
-    this.contactChangedEvent.next(this.contacts.slice());
+    this.contactListChangedEvent.next(this.contacts.slice());
   }
 
   updateContact(originalContact: Contact, newContact: Contact) {
     if (!originalContact || !newContact) return;
 
-    const pos = this.contacts.findIndex(c => c.id === originalContact.id);
+    const pos = this.contacts.indexOf(originalContact);
     if (pos < 0) return;
 
     newContact.id = originalContact.id;
     this.contacts[pos] = newContact;
-    
-    this.contactChangedEvent.next(this.contacts.slice());
+    this.contactListChangedEvent.next(this.contacts.slice());
   }
 
   deleteContact(contact: Contact) {
     if (!contact) return;
 
-    const pos = this.contacts.findIndex(c => c.id === contact.id);
+    const pos = this.contacts.indexOf(contact);
     if (pos < 0) return;
 
     this.contacts.splice(pos, 1);
-    this.contactChangedEvent.next(this.contacts.slice());
+    this.contactListChangedEvent.next(this.contacts.slice());
   }
 }

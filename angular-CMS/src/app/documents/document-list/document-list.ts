@@ -18,23 +18,20 @@ import { DocumentItemComponent } from '../document-item/document-item';
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
   documents: Document[] = [];
-  private subscription!: Subscription;
+  subscription!: Subscription;
 
   constructor(private documentService: DocumentService) {}
 
   ngOnInit() {
     this.documents = this.documentService.getDocuments();
-
-    this.subscription = this.documentService.documentChangedEvent.subscribe(
-      (documentsList: Document[] | undefined) => {
-        this.documents = documentsList || [];
+    this.subscription = this.documentService.documentListChangedEvent.subscribe(
+      (documentsList: Document[]) => {
+        this.documents = documentsList;
       }
     );
   }
 
   ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.subscription.unsubscribe();
   }
 }
