@@ -1,6 +1,11 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title">Contacts</h3>
+    <div class="row" style="padding: 10px; display: flex; align-items: center;">
+      <span class="title" style="font-size: 24px; font-weight: bold; margin-left: 10px;">Contacts</span>
+      <div style="flex-grow: 1;"></div>
+      <a [routerLink]="['new']" class="btn btn-success" style="margin-right: 10px;">Add Contact</a>
+    </div>
+    <div class="clearfix"></div>
   </div>
   <div class="panel-body">
     <div class="row">
@@ -15,4 +20,3 @@
     </div>
   </div>
 </div>
-

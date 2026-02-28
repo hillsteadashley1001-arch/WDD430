@@ -12,8 +12,8 @@
             size="120"
             max="120"
             [ngModel]="contact?.name"
-            required
-            #name="ngModel">
+            #name="ngModel"
+            required>
         </div>
       </div>
 
@@ -21,15 +21,19 @@
         <div class="col-sm-12 form-group">
           <label for="email">Email:</label>
           <input
-          type="text"
-          id="email"
-          name="email"
-          class="form-control"
-          [ngModel]="contact?.email"
-          required
-          pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,3}$"
-          #email="ngModel">
-          <div class="alert alert-danger" *ngIf="!email.valid && email.touched">Enter a valid Email address.</div>
+            type="text"
+            id="email"
+            name="email"
+            class="form-control required"
+            size="120"
+            max="255"
+            [ngModel]="contact?.email"
+            #email="ngModel"
+            required
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+          <div class="alert alert-danger" *ngIf="email.touched && !email.valid">
+            Enter a valid Email address
+          </div>
         </div>
       </div>
 
@@ -40,11 +44,15 @@
             type="text"
             id="phone"
             name="phone"
-            class="form-control invalid"
+            class="form-control"
             size="150"
             max="255"
             [ngModel]="contact?.phone"
-            #phone="ngModel">
+            #phone="ngModel"
+            pattern="\D*([2-9]\d{2})(\D*)([2-9]\d{2})(\D*)(\d{4})\D*">
+          <div class="alert alert-danger" *ngIf="phone.touched && !phone.valid">
+            Enter a valid phone number
+          </div>
         </div>
       </div>
 
@@ -58,29 +66,27 @@
             class="form-control"
             size="150"
             max="255"
-            [ngModel]="contact?.imageUrl"
-            #imageUrl="ngModel">
+            [ngModel]="contact?.imageUrl">
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-12 form-group">
-          <label>Contact Group:</label>
-          <div class="alert alert-info">
-            Group functionality (drag and drop) will be added in a future update.
-          </div>
-          <div class="row" id="groupList" style="min-height: 50px;">
-            <div *ngFor="let contact of groupContacts; let i = index">
-              <div class="col-sm-11">
-                <cms-contact-item [contact]="contact"></cms-contact-item>
+          <label for="groupList">Group Contacts:</label>
+          <div class="row" id="groupList" style="min-height: 3rem;">
+            <div *ngFor="let contactItem of groupContacts; let i = index">
+              <div>
+                <cms-contact-item class="col-sm-11" [contact]="contactItem"></cms-contact-item>
+                <button class="btn btn-danger col-sm-2 deleteButton" (click)="onRemoveItem(i)">X</button>
               </div>
             </div>
+            <span class="dragMsg" *ngIf="!groupContacts || groupContacts.length < 1">Drag contacts in group here</span>
           </div>
         </div>
       </div>
 
-      <div class="alert alert-danger" *ngIf="!name.valid || !email.valid">
-        The Name and Email are required.
+      <div class="alert alert-danger" *ngIf="(name.untouched && !name.valid) || (email.untouched && !email.valid)">
+        The Name and Email fields are required.
       </div>
 
       <div class="row">
