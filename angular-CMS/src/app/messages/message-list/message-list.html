@@ -1,21 +1,29 @@
 <section class="message-list">
-  <!-- Message Edit Form (top) -->
   <cms-message-edit (addMessageEvent)="onAddMessage($event)"></cms-message-edit>
   
-  <!-- Messages List -->
   <div class="messages-container">
-    <h3>Messages ({{ messages.length }})</h3>
+    <div class="row">
+      <div class="col-xs-12">
+        <h3 class="pull-left">Messages ({{ messages.length }})</h3>
+      </div>
+    </div>
     
-    <div class="messages" *ngIf="messages.length > 0">
+    <hr>
+
+    <div class="messages" *ngIf="messages && messages.length > 0">
       <cms-message-item 
         *ngFor="let message of messages; trackBy: trackById" 
         [message]="message">
       </cms-message-item>
     </div>
     
-    <p *ngIf="messages.length === 0" class="no-messages">
-      No messages yet. Create one above!
-    </p>
+    <div *ngIf="!messages || messages.length === 0" class="text-center" style="margin-top: 20px;">
+      <div class="alert alert-info" *ngIf="!messages">
+        Loading messages from Firebase...
+      </div>
+      <p *ngIf="messages && messages.length === 0" class="no-messages text-muted">
+        No messages yet. Create one above!
+      </p>
+    </div>
   </div>
 </section>
-

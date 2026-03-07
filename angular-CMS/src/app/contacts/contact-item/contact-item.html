@@ -2,10 +2,17 @@
   [routerLink]="[contact.id]" 
   routerLinkActive="active" 
   class="list-group-item clearfix cursor-pointer">
+  
   <div class="pull-left">
-    <h4 class="list-group-item-heading">{{ contact.name }}</h4>
+    <h4 class="list-group-item-heading" style="margin-top: 15px;">{{ contact.name }}</h4>
   </div>
+
   <span class="pull-right">
-    <img [src]="contact.imageUrl" alt="{{ contact.name }}" class="img-responsive" style="max-height: 50px;">
+    <img 
+      [src]="contact.imageUrl ? 'images/' + contact.imageUrl : 'images/placeholder.png'" 
+      [alt]="contact.name" 
+      class="img-responsive" 
+      style="max-height: 50px; border-radius: 4px;">
   </span>
+  
 </a>

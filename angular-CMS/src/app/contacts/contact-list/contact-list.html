@@ -1,21 +1,40 @@
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <div class="row" style="padding: 10px; display: flex; align-items: center;">
-      <span class="title" style="font-size: 24px; font-weight: bold; margin-left: 10px;">Contacts</span>
-      <div style="flex-grow: 1;"></div>
-      <a [routerLink]="['new']" class="btn btn-success" style="margin-right: 10px;">Add Contact</a>
-    </div>
-    <div class="clearfix"></div>
-  </div>
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-xs-12">
+<div class="row">
+  <div class="col-xs-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row" style="padding-bottom: 10px;">
+          <span class="title pad-left-right" style="font-size: 24px; font-weight: bold;">Contacts</span>
+        </div>
+        <div class="row" style="display: flex; align-items: center; padding: 0 10px;">
+          <div class="input-group pull-left col-xs-7">
+            <input #searchBox
+                   (keyup)="search(searchBox.value)"
+                   class="form-control"
+                   placeholder="Enter a search value">
+            <div class="glyphicon glyphicon-search input-group-addon" 
+                 (click)="search(searchBox.value)" 
+                 style="cursor: pointer;"></div>
+          </div>
+          <div style="flex-grow: 1;"></div>
+          <div class="pull-right">
+            <a class="btn btn-success" [routerLink]="['new']">New Contact</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel-body">
         <cms-contact-item 
-          *ngFor="let contact of contacts" 
-          [contact]="contact"
-          [routerLink]="[contact.id]"
-          routerLinkActive="active">
+          *ngFor="let contact of contacts | contactsFilter: term" 
+          [contact]="contact">
         </cms-contact-item>
+
+        <div *ngIf="!contacts || contacts.length === 0" class="text-center" style="padding: 20px;">
+          <p class="text-muted">No contacts found. Loading from Firebase...</p>
+        </div>
+        
+        <div *ngIf="contacts.length > 0 && (contacts | contactsFilter: term).length === 0" class="text-center">
+          <p class="text-danger">No contacts match your search: "{{ term }}"</p>
+        </div>
       </div>
     </div>
   </div>

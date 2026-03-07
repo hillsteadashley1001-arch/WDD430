@@ -6,11 +6,19 @@
       <a [routerLink]="['new']" class="btn btn-success" style="margin-right: 10px;">Add Document</a>
     </div>
   </div>
+  
   <div class="panel-body">
     <div class="row" style="display: flex; flex-wrap: wrap;">
-      <div class="col-xs-3" *ngFor="let document of documents" style="margin-bottom: 20px;">
-        <cms-document-item [document]="document"></cms-document-item>
+      <div 
+        class="col-sm-4 col-md-3" 
+        *ngFor="let document of documents" 
+        style="margin-bottom: 20px; display: flex;"> <cms-document-item [document]="document" style="flex: 1; width: 100%;"></cms-document-item>
+        
       </div>
+    </div>
+    
+    <div *ngIf="documents?.length === 0" class="text-center">
+      <p>No documents found. Loading...</p>
     </div>
   </div>
 </div>
