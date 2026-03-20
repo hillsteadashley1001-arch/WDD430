@@ -1,70 +1,78 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { Document } from './document.model';
+
+/** Node/Express documents API (maps to server/routes/documents.js router.get('/')). */
+const DOCUMENTS_API_URL = 'http://localhost:3000/documents';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DocumentService {
   documentListChangedEvent = new BehaviorSubject<Document[]>([]);
+  /** True while GET /documents is in flight; false after success or error. */
+  documentsLoading = new BehaviorSubject<boolean>(true);
   documents: Document[] = [];
   maxDocumentId!: number;
-  firebaseUrl = 'https://cms-codingqueen1001-default-rtdb.firebaseio.com/documents.json';
 
-  constructor(private http: HttpClient) {
-    // constructor is now empty to prevent early execution
-  }
+  constructor(private http: HttpClient) {}
 
-  fetchDocuments() {
-    this.http.get<Document[]>(this.firebaseUrl).subscribe({
-      next: (documents: any) => {
-        console.log('1. Firebase Raw Response:', documents);
-
-        // Standardize data: handle objects/arrays and filter nulls
-        const fetchedDocs = documents ? Object.values(documents) : [];
-        this.documents = (fetchedDocs as Document[]).filter(doc => !!doc && typeof doc === 'object');
-        
-        console.log('2. Processed Array:', this.documents);
-
-        this.maxDocumentId = this.getMaxId();
-        
-        this.documents.sort((a, b) => {
-          const nameA = a.name ? a.name.toLowerCase() : '';
-          const nameB = b.name ? b.name.toLowerCase() : '';
-          return nameA.localeCompare(nameB);
-        });
-
-        // Broadcast the data to the BehaviorSubject
-        this.documentListChangedEvent.next([...this.documents]);
-        console.log('3. Service Dispatched:', this.documents.length, 'documents');
-      },
-      error: (error: any) => console.error('Fetch Error:', error)
-    });
-  }
-
+  /**
+   * HTTP GET all documents from the Node server (MongoDB `documents` collection).
+   */
   getDocuments() {
+    this.documentsLoading.next(true);
+    this.http
+      .get<Document[]>(DOCUMENTS_API_URL)
+      .pipe(finalize(() => this.documentsLoading.next(false)))
+      .subscribe({
+        next: (documents) => {
+          this.documents = Array.isArray(documents)
+            ? documents.filter((doc) => !!doc && typeof doc === 'object')
+            : [];
+          this.sortAndSend();
+        },
+        error: (error: unknown) => console.error('Fetch documents error:', error)
+      });
+  }
+
+  /** @deprecated Use getDocuments(); kept for compatibility. */
+  fetchDocuments() {
+    this.getDocuments();
+  }
+
+  /** Synchronous copy of the last loaded documents (after getDocuments() completes). */
+  getDocumentsSnapshot(): Document[] {
     return [...this.documents];
   }
 
+  /** @deprecated Use POST/PUT/DELETE via API; kept for compatibility if referenced elsewhere. */
   storeDocuments() {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    
-    this.http.put(this.firebaseUrl, JSON.stringify(this.documents), { headers }).subscribe({
-      next: () => {
-        console.log('Data saved to Firebase. Broadcasting update...');
-        this.documentListChangedEvent.next([...this.documents]);
-      },
-      error: (error: any) => console.error('Store Error:', error)
+    this.documentListChangedEvent.next([...this.documents]);
+  }
+
+  private sortDocuments() {
+    this.documents.sort((a, b) => {
+      const nameA = a.name ? a.name.toLowerCase() : '';
+      const nameB = b.name ? b.name.toLowerCase() : '';
+      return nameA.localeCompare(nameB);
     });
+  }
+
+  private sortAndSend() {
+    this.maxDocumentId = this.getMaxId();
+    this.sortDocuments();
+    this.documentListChangedEvent.next([...this.documents]);
   }
 
   getMaxId(): number {
     let maxId = 0;
-    this.documents.forEach(doc => {
-      if (doc && doc.id) {
-        const currentId = parseInt(doc.id, 10);
-        if (currentId > maxId) maxId = currentId;
+    this.documents.forEach((doc) => {
+      if (doc?.id) {
+        const currentId = parseInt(String(doc.id), 10);
+        if (!Number.isNaN(currentId) && currentId > maxId) maxId = currentId;
       }
     });
     return maxId;
@@ -74,32 +82,90 @@ export class DocumentService {
     return this.documents.find((doc) => String(doc.id) === id) || null;
   }
 
-  addDocument(newDocument: Document) {
-    if (!newDocument) return;
-    this.maxDocumentId++;
-    newDocument.id = String(this.maxDocumentId);
-    this.documents.push(newDocument);
-    this.storeDocuments();
+  addDocument(document: Document) {
+    if (!document) {
+      return;
+    }
+
+    // make sure id of the new Document is empty
+    document.id = '';
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    // add to database
+    this.http
+      .post<{ message: string; document: Document }>(
+        DOCUMENTS_API_URL,
+        document,
+        { headers }
+      )
+      .subscribe({
+        next: (responseData) => {
+          if (responseData.document) {
+            this.documents.push(responseData.document);
+            this.sortAndSend();
+          }
+        },
+        error: (error: unknown) => console.error('Add document error:', error)
+      });
   }
 
   updateDocument(originalDocument: Document, newDocument: Document) {
-    if (!originalDocument || !newDocument) return;
+    if (!originalDocument || !newDocument) {
+      return;
+    }
 
-    const pos = this.documents.findIndex(d => d.id === originalDocument.id);
-    if (pos < 0) return;
+    const pos = this.documents.findIndex((d) => d.id === originalDocument.id);
 
+    if (pos < 0) {
+      return;
+    }
+
+    // set the id of the new Document to the id of the old Document
     newDocument.id = originalDocument.id;
-    this.documents[pos] = newDocument;
-    this.storeDocuments();
+    newDocument._id = originalDocument._id;
+
+    // keep nested children when the edit form does not send them
+    if (newDocument.children == null && originalDocument.children != null) {
+      newDocument.children = originalDocument.children;
+    }
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    const url =
+      DOCUMENTS_API_URL + '/' + encodeURIComponent(String(originalDocument.id));
+
+    // update database
+    this.http.put(url, newDocument, { headers }).subscribe({
+      next: () => {
+        this.documents[pos] = newDocument;
+        this.sortAndSend();
+      },
+      error: (error: unknown) => console.error('Update document error:', error)
+    });
   }
 
   deleteDocument(document: Document) {
-    if (!document) return;
+    if (!document) {
+      return;
+    }
 
-    const pos = this.documents.findIndex(d => d.id === document.id);
-    if (pos < 0) return;
+    const pos = this.documents.findIndex((d) => d.id === document.id);
 
-    this.documents.splice(pos, 1);
-    this.storeDocuments();
+    if (pos < 0) {
+      return;
+    }
+
+    // delete from database — maps to router.delete('/:id') in documents.js
+    const url =
+      DOCUMENTS_API_URL + '/' + encodeURIComponent(String(document.id));
+
+    this.http.delete(url).subscribe({
+      next: () => {
+        this.documents.splice(pos, 1);
+        this.sortAndSend();
+      },
+      error: (error: unknown) => console.error('Delete document error:', error)
+    });
   }
 }

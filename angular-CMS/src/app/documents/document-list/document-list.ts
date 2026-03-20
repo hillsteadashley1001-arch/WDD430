@@ -26,7 +26,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     // This prepares the component to "catch" the data when it arrives.
     this.subscription = this.documentService.documentListChangedEvent
       .subscribe((documentsList: Document[]) => {
-        console.log('4. Component Received via Subscription:', documentsList.length);
         this.documents = documentsList;
         
         // Force Angular to refresh the view
@@ -38,7 +37,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.documentService.fetchDocuments();
     
     // 3. Optional: Sync immediate check
-    const currentDocs = this.documentService.getDocuments();
+    const currentDocs = this.documentService.getDocumentsSnapshot();
     if (currentDocs.length > 0) {
       this.documents = currentDocs;
     }

@@ -17,8 +17,17 @@
       </div>
     </div>
     
-    <div *ngIf="documents?.length === 0" class="text-center">
-      <p>No documents found. Loading...</p>
+    <p *ngIf="documentService.documentsLoading | async" class="text-center text-muted">
+      Loading documents…
+    </p>
+    <div
+      *ngIf="!(documentService.documentsLoading | async) && documents?.length === 0"
+      class="text-center">
+      <p>No documents found.</p>
+      <p class="text-muted small">
+        Add one with <strong>Add Document</strong>, or import into MongoDB
+        <code>cms.documents</code> (e.g. <code>mongoimport</code>).
+      </p>
     </div>
   </div>
 </div>

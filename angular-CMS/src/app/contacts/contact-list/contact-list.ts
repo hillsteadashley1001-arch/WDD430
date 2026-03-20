@@ -40,7 +40,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
     this.contactService.fetchContacts();
 
     // 4. Initial sync check in case data is already in the service
-    const initialContacts = this.contactService.getContacts();
+    const initialContacts = this.contactService.getContactsSnapshot();
     if (initialContacts.length > 0) {
       this.contacts = initialContacts;
     }

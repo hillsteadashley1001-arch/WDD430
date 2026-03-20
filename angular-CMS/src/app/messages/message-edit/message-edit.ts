@@ -22,10 +22,10 @@ export class MessageEditComponent {
     const msgText = this.msgTextInput.nativeElement.value;
     
     const newMessage = new Message(
-      Date.now().toString(),  // ID from timestamp
+      '',
       subject,
-      msgText,
-      this.currentSender
+      this.currentSender,
+      msgText
     );
     
     this.addMessageEvent.emit(newMessage);
